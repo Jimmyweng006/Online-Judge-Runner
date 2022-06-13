@@ -17,6 +17,7 @@ class JVMExecutor(val workspace: String): IExecutor {
         val inputFilePath = workspace.appendPath(JVM_INPUT_FILENAME)
         val outputFilePath = workspace.appendPath(JVM_OUTPUT_FILENAME)
         val inputFile = input.writeToFile(inputFilePath)
+        val dockerContainerName = DOCKER_CONTAINER_NAME + RandomStringGenerator.Generate(32)
 
         val startTime = System.currentTimeMillis()
         /* 使用 Docker 來執行程式 */
@@ -25,7 +26,7 @@ class JVMExecutor(val workspace: String): IExecutor {
             "run",
             "--rm",
             "--name",
-            DOCKER_CONTAINER_NAME,
+            dockerContainerName,
             "-v",
             "${System.getProperty("user.dir").appendPath(workspace)}:/$workspace",
             "dyninka/kotlin:dyninka",
@@ -41,7 +42,7 @@ class JVMExecutor(val workspace: String): IExecutor {
 
         /* 如果 TLE 的話，除了砍掉執行的指令，還要讓 Docker 去砍掉該 Container 才行。 */
         if (!isFinished) {
-            ProcessBuilder("docker", "kill", DOCKER_CONTAINER_NAME).start().waitFor()
+            ProcessBuilder("docker", "kill", dockerContainerName).start().waitFor()
         }
         // use to terminate executeProcess
         process.destroy()

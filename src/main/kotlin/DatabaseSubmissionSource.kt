@@ -3,7 +3,6 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import redis.clients.jedis.Jedis
@@ -11,6 +10,7 @@ import redis.clients.jedis.Jedis
 const val SUPPORTED_LANGUAGE = "kotlin"
 
 object DatabaseSubmissionSource: ISubmissionSource {
+    private val supportedLanguages = listOf("kotlin", "c", "java", "python", "c++")
     var jedis: Jedis?
 
     init {
@@ -34,17 +34,21 @@ object DatabaseSubmissionSource: ISubmissionSource {
 //            if (jedis == null) return null
 
             val currentJedisConnection = jedis!!
-            val isDataAvailable = currentJedisConnection.exists(SUPPORTED_LANGUAGE)
-            if (!isDataAvailable) return null
+            for (language in supportedLanguages) {
+                val isDataAvailable = currentJedisConnection.exists(language)
+                if (!isDataAvailable) continue
 
-            val data = currentJedisConnection.lpop(SUPPORTED_LANGUAGE)
-            return jacksonObjectMapper().readValue(data, SubmissionData::class.java)
+                val data = currentJedisConnection.lpop(language)
+                return jacksonObjectMapper().readValue(data, SubmissionData::class.java)
+            }
         } catch(e: Exception) {
             jedis?.disconnect()
             jedis = null
             println(e)
             return null
         }
+
+        return null
     }
 
     override fun setResult(id: Int, result: Judger.Result, executedTime: Double, score: Int) {

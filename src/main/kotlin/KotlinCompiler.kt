@@ -1,8 +1,8 @@
 import java.nio.file.Files
 import java.nio.file.Paths
 
-const val KOTLIN_CODE_FILENAME = "_code.kt"
-const val KOTLIN_CODE_EXECUTABLE_FILENAME = "_code.jar"
+private const val KOTLIN_CODE_FILENAME = "_code.kt"
+private const val KOTLIN_CODE_EXECUTABLE_FILENAME = "_code.jar"
 
 class KotlinCompiler(val workspace: String): ICompiler {
     init {

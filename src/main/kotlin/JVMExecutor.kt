@@ -3,9 +3,9 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.concurrent.TimeUnit
 
-const val DOCKER_CONTAINER_NAME = "jvm-docker"
-const val JVM_INPUT_FILENAME = "input.txt"
-const val JVM_OUTPUT_FILENAME = "output.txt"
+private const val DOCKER_CONTAINER_NAME = "jvm-docker"
+private const val JVM_INPUT_FILENAME = "input.txt"
+private const val JVM_OUTPUT_FILENAME = "output.txt"
 
 class JVMExecutor(val workspace: String): IExecutor {
     init {
